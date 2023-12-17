@@ -65,8 +65,47 @@ func UpdateEmployee() gofr.Handler{
 		query := bson.D{{Key: "_id",Value: employeeId}}
 		update := bson.D{
 			{
-
-			}
+				Key: "$set",
+				Value: bson.D{
+					{Key: "first_name",Value: employee.First_name},
+					{Key: "last_name",Value: employee.Last_name},
+					{Key: "email",Value: employee.Email},
+					{Key: "phone",Value: employee.Phone},
+					{Key: "salary",Value: employee.Salary},
+				},
+			},
 		}
+		if err := employeeCollection.FindOneAndUpdate(ctx.Context,query,update).Err(); err != nil{
+			if err == mongo.ErrNoDocuments{
+				log.Fatalln(err)
+				return nil, err
+			}
+			log.Fatalln(err)
+			return nil, err
+		}
+		employee.ID = idParam
+		return employee, nil
+	}
+}
+
+func DeleteEmployee() gofr.Handler{
+	return func(ctx *gofr.Context) (interface{},error) {
+		idParam := ctx.Param("id")
+		employeeId, err := primitive.ObjectIDFromHex(idParam)
+		if(err != nil){
+			log.Fatalln(err)
+			return nil, err
+		}
+		query := bson.D{{Key: "_id",Value: employeeId}}
+		result, err := employeeCollection.DeleteOne(ctx.Context,query)
+		if(err != nil){
+			log.Fatalln(err)
+			return nil, err
+		}
+		if(result.DeletedCount < 1){
+			log.Fatalln("404 not found")
+			return nil, err
+		}
+		return "record deleted", nil
 	}
 }
