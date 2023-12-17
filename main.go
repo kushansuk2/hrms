@@ -12,7 +12,7 @@ func main(){
 	app := gofr.New()
 	err := godotenv.Load("configs/.env")
 	if err != nil {
-		log.Fatal("error in loading .env")
+		log.Fatalln("error in loading .env")
 	}
 	port := os.Getenv("HTTP_PORT")
 	fmt.Println("server starting at port ", port)
