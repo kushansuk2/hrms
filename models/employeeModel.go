@@ -1,7 +1,7 @@
 package models
 
 type Employee struct{
-	ID            string			 `json:"id" bson:"_id"`
+	ID            string			 `json:"id,omitempty" bson:"_id,omitempty"`
 	First_name    string             `json:"first_name" validate:"required,min=2,max=100"`
 	Last_name     string             `json:"last_name" validate:"required, min=2,max=100"`
 	Email         string             `json:"email" validate:"email,required"`

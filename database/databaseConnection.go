@@ -7,7 +7,6 @@ import (
 	"fmt"
 
 	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -18,7 +17,8 @@ func DBinstance() *mongo.Client{
 		log.Fatalln("error in loading .env",err)
 	} 
 
-	uri := os.Getenv("MONGO_URI")
+	x := os.Getenv("MONGO_URI")
+	uri := x + "hrms"
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI)
 
@@ -27,17 +27,17 @@ func DBinstance() *mongo.Client{
 	if(err!=nil){
 		log.Fatalln("error in connecting uri to mongo",err)
 	}
-	defer func() {
-		if err = client.Disconnect(context.TODO()); err != nil {
-			log.Fatalln(err)
-		}
-	}()
+	// defer func() {
+	// 	if err = client.Disconnect(context.TODO()); err != nil {
+	// 		log.Fatalln(err)
+	// 	}
+	// }()
 
 	// this code is to check if connection is succesfull or not
-	var result bson.M
-	if err := client.Database("admin").RunCommand(context.TODO(), bson.D{{"ping", 1}}).Decode(&result); err != nil {
-		log.Fatalln(err)
-	}
+	// var result bson.M
+	// if err := client.Database("admin").RunCommand(context.TODO(), bson.D{{"ping", 1}}).Decode(&result); err != nil {
+	// 	log.Fatalln(err)
+	// }
 	fmt.Println("connected to mongoDB!")
 	return client
 }
@@ -49,6 +49,6 @@ var Client *mongo.Client = DBinstance()
 
 // this function helps to return particular collection from database
 func OpenCollection(collectionName string) *mongo.Collection{
-	collection := Client.Database("cluster0").Collection(collectionName)
+	collection := Client.Database("hrms").Collection(collectionName)
 	return collection
 }

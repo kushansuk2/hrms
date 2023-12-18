@@ -4,6 +4,7 @@ import(
 	"os"
 	"fmt"
 	"log"
+	"hrms/routes"
 	"github.com/joho/godotenv"
 	"gofr.dev/pkg/gofr"
 )
@@ -15,6 +16,7 @@ func main(){
 		log.Fatalln("error in loading .env")
 	}
 	port := os.Getenv("HTTP_PORT")
+	routes.EmployeeRoutes(app)
 	fmt.Println("server starting at port ", port)
 	app.Start()
 }

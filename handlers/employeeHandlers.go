@@ -15,7 +15,7 @@ var employeeCollection *mongo.Collection = db.OpenCollection("employee")
 func GetAllEmployees() gofr.Handler{ 
 	return func(ctx *gofr.Context) (interface{}, error){
 		query := bson.D{{}}
-		cursor, err := employeeCollection.Find(ctx.Context,query)
+		cursor, err := employeeCollection.Find(ctx,query)
 		if(err!=nil){
 			log.Fatalln(err)
 		}
@@ -32,17 +32,17 @@ func CreateEmployee() gofr.Handler{
 	return func(ctx *gofr.Context) (interface{}, error){
 		var employee models.Employee
 		if err := ctx.Bind(&employee); err != nil {
-			log.Fatalln(err)
+			log.Fatalln("bind")
 			return nil, err
 		}
-		employee.ID = ""
-		insertionResult, err := employeeCollection.InsertOne(ctx.Context,employee)
+		// employee.ID = ""
+		insertionResult, err := employeeCollection.InsertOne(ctx,employee)
 		if(err != nil){
-			log.Fatalln(err)
+			log.Fatalln("inserting", err)
 			return nil, err
 		}
 		filter := bson.D{{Key: "_id", Value: insertionResult.InsertedID}}
-		createdRecord := employeeCollection.FindOne(ctx.Context,filter)
+		createdRecord := employeeCollection.FindOne(ctx,filter)
 		createdEmployee := &models.Employee{}
 		createdRecord.Decode(createdEmployee)
 		return createdEmployee, nil
@@ -51,7 +51,7 @@ func CreateEmployee() gofr.Handler{
 
 func UpdateEmployee() gofr.Handler{
 	return func(ctx *gofr.Context) (interface{},error){
-		idParam := ctx.Param("id")
+		idParam := ctx.PathParam("id")
 		employeeId, err := primitive.ObjectIDFromHex(idParam)
 		if(err != nil){
 			log.Fatalln(err)
@@ -75,7 +75,7 @@ func UpdateEmployee() gofr.Handler{
 				},
 			},
 		}
-		if err := employeeCollection.FindOneAndUpdate(ctx.Context,query,update).Err(); err != nil{
+		if err := employeeCollection.FindOneAndUpdate(ctx,query,update).Err(); err != nil{
 			if err == mongo.ErrNoDocuments{
 				log.Fatalln(err)
 				return nil, err
@@ -90,14 +90,14 @@ func UpdateEmployee() gofr.Handler{
 
 func DeleteEmployee() gofr.Handler{
 	return func(ctx *gofr.Context) (interface{},error) {
-		idParam := ctx.Param("id")
+		idParam := ctx.PathParam("id")
 		employeeId, err := primitive.ObjectIDFromHex(idParam)
 		if(err != nil){
 			log.Fatalln(err)
 			return nil, err
 		}
 		query := bson.D{{Key: "_id",Value: employeeId}}
-		result, err := employeeCollection.DeleteOne(ctx.Context,query)
+		result, err := employeeCollection.DeleteOne(ctx,query)
 		if(err != nil){
 			log.Fatalln(err)
 			return nil, err
