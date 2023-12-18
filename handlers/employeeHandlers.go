@@ -43,7 +43,7 @@ func CreateEmployee() gofr.Handler{
 		}
 		filter := bson.D{{Key: "_id", Value: insertionResult.InsertedID}}
 		createdRecord := employeeCollection.FindOne(ctx,filter)
-		createdEmployee := &models.Employee{}
+		var createdEmployee models.Employee
 		createdRecord.Decode(createdEmployee)
 		return createdEmployee, nil
 	}
